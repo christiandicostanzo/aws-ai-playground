@@ -14,22 +14,31 @@ uv sync
 
 # Run a script
 uv run main.py
-uv run examples/bedrock/invoke_model.py
+uv run ./bedrock/invoke_model.py
 
 # Add a dependency
 uv add boto3
 uv add --dev pytest
-
-# Run tests
-uv run pytest
-
-# Run a single test
-uv run pytest tests/test_foo.py::test_bar
 ```
 
 ## Structure
 
-As examples are added, organize them by AWS service under an `examples/` directory (e.g., `examples/bedrock/`, `examples/rekognition/`). Each example should be a self-contained runnable script.
+Each AWS service has its own folder under the root folder:
+
+```
+  ./textract/      # AWS Textract — document text extraction, forms, tables
+    main.py
+  ./translate/     # AWS Translate — text translation between languages
+    main.py
+  ./bedrock/       # AWS Bedrock — foundation model inference
+    main.py
+```
+
+Run any example with:
+
+```bash
+uv run ./<service>/main.py
+```
 
 ## Boto3 Documentation
 
