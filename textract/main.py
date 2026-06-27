@@ -3,6 +3,8 @@ from pathlib import Path
 import boto3
 import os
 from loguru import logger
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import boto_client
 
 client = boto_client.get_boto_client("textract")
@@ -99,7 +101,8 @@ def _get_text(block: dict, blocks: dict) -> str:
 
 
 def main() -> None:
-    file_path =  Path(os.path.dirname(os.path.abspath(__file__)) + "\image_example.png")
+    #\image_example.png , alias_cbu.png , cbu.png , cbu_alias.png
+    file_path =  Path(os.path.dirname(os.path.abspath(__file__)) + "\\alias_cbu.png")
     
     if not file_path.exists(): 
         logger.error("Provide a path to an image file as an argument.")
