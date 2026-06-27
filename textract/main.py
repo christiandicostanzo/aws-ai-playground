@@ -1,11 +1,13 @@
 import sys
 from pathlib import Path
-
 import boto3
+import os
 from loguru import logger
+import boto_client
 
+client = boto_client.get_boto_client("textract")
 
-def detect_text(client, image_bytes: bytes) -> list[str]:
+def detect_text(image_bytes: bytes) -> list[str]:
     response = client.detect_document_text(Document={"Bytes": image_bytes})
     lines = [
         block["Text"]
@@ -18,7 +20,7 @@ def detect_text(client, image_bytes: bytes) -> list[str]:
     return lines
 
 
-def analyze_forms(client, image_bytes: bytes) -> dict[str, str]:
+def analyze_forms(image_bytes: bytes) -> dict[str, str]:
     response = client.analyze_document(
         Document={"Bytes": image_bytes},
         FeatureTypes=["FORMS"],
@@ -41,7 +43,7 @@ def analyze_forms(client, image_bytes: bytes) -> dict[str, str]:
     return pairs
 
 
-def analyze_tables(client, image_bytes: bytes) -> list[list[list[str]]]:
+def analyze_tables(image_bytes: bytes) -> list[list[list[str]]]:
     response = client.analyze_document(
         Document={"Bytes": image_bytes},
         FeatureTypes=["TABLES"],
@@ -97,26 +99,26 @@ def _get_text(block: dict, blocks: dict) -> str:
 
 
 def main() -> None:
-    image_path = Path(sys.argv[1]) if len(sys.argv) > 1 else None
-    if image_path is None or not image_path.exists():
+    file_path =  Path(os.path.dirname(os.path.abspath(__file__)) + "\image_example.png")
+    
+    if not file_path.exists(): 
         logger.error("Provide a path to an image file as an argument.")
         logger.info("Usage: uv run examples/textract/main.py <image_path>")
         logger.info("Supports: JPEG, PNG, TIFF (max 5 MB for synchronous API)")
-        sys.exit(1)
-
-    image_bytes = image_path.read_bytes()
-    logger.info(f"Processing {image_path} ({len(image_bytes):,} bytes)")
-
-    client = boto3.client("textract")
+        sys.exit(1)   
+        
+    image_bytes = file_path.read_bytes()
+    logger.info(f"Processing {file_path} ({len(image_bytes):,} bytes)")
 
     logger.info("=== Text Detection ===")
-    detect_text(client, image_bytes)
+    detect_text(image_bytes)
+    logger.info("=== END Text Detection ===")
 
-    logger.info("=== Form Analysis ===")
-    analyze_forms(client, image_bytes)
+    #logger.info("=== Form Analysis ===")
+    #analyze_forms(image_bytes)
 
-    logger.info("=== Table Extraction ===")
-    analyze_tables(client, image_bytes)
+    #logger.info("=== Table Extraction ===")
+    #analyze_tables(image_bytes)
 
 
 if __name__ == "__main__":

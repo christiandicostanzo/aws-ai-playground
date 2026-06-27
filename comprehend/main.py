@@ -1,4 +1,5 @@
 import boto3
+import boto_client
 from loguru import logger
 
 SAMPLE_TEXT = (
@@ -7,12 +8,7 @@ SAMPLE_TEXT = (
     "I enjoyed visiting the spa. It was very comfortable but it was also very expensive. The amenities were ok but the service made the spa a great experience."
 )
 
-boto3.set_stream_logger('botocore', level='DEBUG')
-#session = boto3.Session()
-
- 
-client = session.client("comprehend")
-
+client = boto_client.get_boto_client("comprehend")
 
 def detect_language(text: str) -> str:
     response = client.detect_dominant_language(Text=text)

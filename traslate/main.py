@@ -1,5 +1,8 @@
 import boto3
+import boto_client
 from loguru import logger
+
+client = boto_client.get_boto_client("traslate")
 
 SAMPLE_TEXTS = [
     ("Hello, how are you? I hope you are having a wonderful day.", "es"),
@@ -8,8 +11,7 @@ SAMPLE_TEXTS = [
     ("Please submit your report by the end of the week.", "ja"),
 ]
 
-
-def translate_text(client, text: str, target_language: str, source_language: str = "auto") -> str:
+def translate_text(text: str, target_language: str, source_language: str = "auto") -> str:
     response = client.translate_text(
         Text=text,
         SourceLanguageCode=source_language,
@@ -23,7 +25,7 @@ def translate_text(client, text: str, target_language: str, source_language: str
     return translation
 
 
-def list_supported_languages(client) -> None:
+def list_supported_languages() -> None:
     paginator = client.get_paginator("list_languages")
     languages = []
     for page in paginator.paginate():
@@ -36,14 +38,12 @@ def list_supported_languages(client) -> None:
 
 
 def main() -> None:
-    client = boto3.client("translate")
-
     logger.info("=== Supported Languages (sample) ===")
-    list_supported_languages(client)
+    list_supported_languages()
 
     logger.info("=== Text Translation ===")
     for text, target in SAMPLE_TEXTS:
-        translate_text(client, text, target_language=target)
+        translate_text(text, target_language=target)
         logger.debug("")
 
 
